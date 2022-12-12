@@ -134,16 +134,25 @@ If the NFT issued based on the above standard does not have a `guard` role, then
   
 ```solidity
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./IERC721QS.sol";
 
-
-
 abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
 
-    mapping(uint256 => address) private token_guard_map;
+    address public initializedGuard;
+    bool public isSBT;
+    
+    ///@dev When the contract is constructed, the parameters `address` and `bool` are passed in. 
+    ///If it is SBT, `isSBT_` is `true`, and the initialized guard address is `initializedGuard`.
+    ///if it is not SBT, `isSBT_` is `false`, and `initializedGuard_` is `address( 0)`.
+    constructor(string memory name_, string memory symbol_,bool isSBT_,address initializedGuard_) ERC721(name_, symbol_) {
+    initializedGuard= initializedGuard_;
+    isSBT=isSBT_;
+    }
+    
+    mapping(uint256 => address) internal token_guard_map;
 
     /// @notice Update the guard of the NFT
     /// @dev Delete function: set guard  to 0 address,update function: set guard to new address
@@ -151,16 +160,15 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
     /// @param tokenId The NFT to update the guard address for
     /// @param newGuard The newGuard address
     /// @param allowNull Allow 0 address
-    function updateGuard(uint256 tokenId,address newGuard,bool allowNull) internal virtual {
-        address owner = ownerOf(tokenId); 
+    function updateGuard(uint256 tokenId,address newGuard,bool allowNull) internal {
         address guard = guardOf(tokenId);
         if (!allowNull) {
             require(newGuard != address(0), "New guard can not be null");
         }
-         if (guard != address(0)) { 
+        if (guard != address(0)) { 
             require(guard == _msgSender(), "only guard can change it self"); 
         } else { 
-            require(owner == _msgSender(), "only owner can set guard"); 
+            require(_isApprovedOrOwner(_msgSender(), tokenId),"ERC721QS: caller is not owner nor approved");
         } 
 
         if (guard != address(0) || newGuard != address(0)) {
@@ -169,20 +177,18 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
         }
     }
 
-    /// @notice  Owner can set guard of the NFT and guard can modifiy guard of the NFT
-    /// If the NFT has a guard role, the owner of the NFT cannot modify guard
+    /// @notice Owner sets guard or guard modifies guard
     /// @dev The newGuard can not be zero address
     /// Throws if `tokenId` is not valid NFT
     /// @param tokenId The NFT to get the guard address for
     /// @param newGuard The new guard address of the NFT
-    function changeGuard(uint256 tokenId, address newGuard) public virtual
-    {
+    function changeGuard(uint256 tokenId, address newGuard) public virtual{
         updateGuard(tokenId, newGuard, false);
     }
 
     /// @notice Remove the guard of the NFT
-    /// Only guard can remove its own guard role
     /// @dev The guard address is set to 0 address
+    ///      Only guard can remove its own guard role
     /// Throws if `tokenId` is not valid NFT
     /// @param tokenId The NFT to remove the guard address for
     function removeGuard(uint256 tokenId) public virtual  {
@@ -190,11 +196,10 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
     }
     
     /// @notice Transfer the NFT and remove its guard role
-    /// @dev The NFT is transferred to `to`and the guard address is set to 0 address
-    /// Throws if `tokenId` is not valid NFT
-    /// @param from The address of the previous owner of the NFT
-    /// @param to The address of NFT recipient 
-    /// @param tokenId The NFT to get transferred for
+    /// Throws  if `tokenId` is not valid NFT
+    /// @param  from The address of the previous owner of the NFT
+    /// @param  to The address of NFT recipient 
+    /// @param  tokenId The NFT to get transferred for
     function transferAndRemove(address from,address to,uint256 tokenId) public virtual {
         transferFrom(from,to,tokenId);
         removeGuard(tokenId);
@@ -214,8 +219,8 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
     /// @dev The zero address indicates there is no guard
     /// Throws if `tokenId` is not valid NFT
     /// @param tokenId The NFT to check the guard address for
-    /// @return The guard address of the NFT
-    function checkOnlyGuard(uint256 tokenId) internal view virtual returns (address) {
+    /// @return The guard address
+    function checkOnlyGuard(uint256 tokenId) internal view returns (address) {
         address guard = guardOf(tokenId);
         address sender = _msgSender();
         if (guard != address(0)) {
@@ -223,6 +228,23 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
             return guard;
         }else{
             return address(0);
+        }
+    }
+    function _beforeTokenTransfer(address from,address to,uint256 tokenId,uint256 batchSize) internal virtual override{
+        super._beforeTokenTransfer(from, to, tokenId,batchSize);
+        ///@dev Before minting, check whether the issued is SBT
+        if(from==address(0)&&isSBT){
+            token_guard_map[tokenId]=initializedGuard;
+             emit UpdateGuardLog(tokenId, to, address(0));
+        }
+    }
+
+    function _afterTokenTransfer(address from,address to,uint256 tokenId,uint256 batchSize) internal virtual override{
+        super._afterTokenTransfer(from, to, tokenId,batchSize);
+        ///@dev After burning, delete `token_guard_map[tokenId]`
+        if(to==address(0)){
+            delete token_guard_map[tokenId]; 
+            emit UpdateGuardLog(tokenId, address(0), from);
         }
     }
  
@@ -243,7 +265,7 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
         _transfer(new_from, to, tokenId);
     }
 
-    /// @dev Before safely transferring the NFT, need to check the gurard address
+    /// @dev Before safe transferring the NFT, need to check the gurard address
     function safeTransferFrom(address from,address to,uint256 tokenId,bytes memory _data) public virtual override {
         address guard;
         address new_from = from;
@@ -259,7 +281,7 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
         }
         _safeTransfer(from, to, tokenId, _data);
     }
-    
+
     /// @dev See {IERC165-supportsInterface}.
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC721QS).interfaceId || super.supportsInterface(interfaceId);
