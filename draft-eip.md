@@ -2,12 +2,12 @@
 eip: <to be assigned>
 title: Guard of NFT/SBT, an Extension of EIP-721
 description: A new management role of NFT/SBT is defined, which realizes the separation of transfer right and holding right of NFT/SBT.
-author: 5660.eth<5660@10kuni.io>,Wizard Wang
-discussions-to: xxx
+author: 5660.eth<@5660-eth>,Wizard Wang
+discussions-to: https://ethereum-magicians.org/t/guard-of-nft-sbt-an-extension-of-eip-721/12052
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-9-01
+created: 2022-12-07
 requirements: 165, 721
 ---
 
@@ -58,7 +58,6 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
     /// @param tokenId The NFT to get the guard address for
     /// @param newGuard The new guard address of the NFT
     function changeGuard(uint256 tokenId, address newGuard) external;
-
   
     /// @notice Remove the guard of the NFT
     /// Only guard can remove its own guard role
@@ -188,7 +187,7 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
 
     /// @notice Remove the guard of the NFT
     /// @dev The guard address is set to 0 address
-    ///      Only guard can remove its own guard role
+    /// Only guard can remove its own guard role
     /// Throws if `tokenId` is not valid NFT
     /// @param tokenId The NFT to remove the guard address for
     function removeGuard(uint256 tokenId) public virtual  {
@@ -214,7 +213,6 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
         return token_guard_map[tokenId];
     }
     
-    
     /// @notice Check the guard address
     /// @dev The zero address indicates there is no guard
     /// Throws if `tokenId` is not valid NFT
@@ -230,6 +228,7 @@ abstract contract ERC721QS is ERC721Enumerable, IERC721QS {
             return address(0);
         }
     }
+  
     function _beforeTokenTransfer(address from,address to,uint256 tokenId,uint256 batchSize) internal virtual override{
         super._beforeTokenTransfer(from, to, tokenId,batchSize);
         ///@dev Before minting, check whether the issued is SBT
