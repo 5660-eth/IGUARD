@@ -93,7 +93,7 @@ The `supportsInterface` method MUST return `true` when called with `0xc0655ef1`.
 
 The standard defines a new role `guard` and regulates the permissions of `owner` and `guard` as follows
 
-`owner`: when the guard of the NFT is empty, `owner` can transfer the NFT, and also set `guard`. However, when `guard` already exists for the NFT, `owner` cannot modify `guard`, and cannot transfer the NFT.
+`owner`（Including authorized operators, which will not be described in detail below）: when the guard of the NFT is empty, `owner` can transfer the NFT, and also set `guard`. However, when `guard` already exists for the NFT, `owner` cannot modify `guard`, and cannot transfer the NFT.
 
 `guard`: The `guard` can remove its own `guard` identity or transfer the NFT to a specified address. For example, the `guard` can be set as the cold wallet address of the NFT holder, or an address trusted by the NFT holder. After the `owner` address of the NFT is abnormal, the `guard` can call the contract to transfer the NFT to the specified address.
 
