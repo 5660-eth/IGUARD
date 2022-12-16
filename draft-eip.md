@@ -2,12 +2,12 @@
 eip: <to be assigned>
 title: Guard of NFT/SBT, an Extension of EIP-721
 description: A new management role of NFT/SBT is defined, which realizes the separation of transfer right and holding right of NFT/SBT.
-author: 5660.eth<5660@10kuni.io>,Wizard Wang
-discussions-to: xxx
+author: 5660.eth<@5660-eth>,Wizard Wang
+discussions-to: https://ethereum-magicians.org/t/guard-of-nft-sbt-an-extension-of-eip-721/12052
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-9-01
+created: 2022-12-07
 requirements: 165, 721
 ---
 
@@ -22,10 +22,6 @@ NFT is an asset that has both use and financial value.
 Many cases of NFT theft currently exist, and current NFT anti-theft schemes, such as transferring NFT to cold wallets, make NFT inconvenient to be used.
 
 In current NFT lending, the NFT owner needs to transfer the NFT to the NFT lending contract, and the NFT owner no longer has the right to use the NFT while he or she has obtained the loan. In the real world, for example, if a person takes out a mortgage on his own house, he still has the right to use that house.
-
-There are some current solutions for NFT leasing, but they are not compatible with the current application protocols. For example, in eip4907, an address that leases an NFT cannot be seen directly in the NFT viewing platform (e.g. OpenSea). The lease agreement needs to be actively recognized by the application protocol for the lease to be valid.
-
-In addition, for the current NFT installment, the purchaser will only be able to gain access to that NFT once the purchaser has paid in full; until then, the NFT remains in the seller's wallet or escrow contract. In the real world, for example, if you buy a phone in installments, you will immediately get the right to use the phone.
 
 For SBT. The current mainstream view is that SBT is not transferable, which makes SBT bound to an Ether address. However, when the private key of the user address is leaked or lost, retrieving SBT will become a complicated task and there is no corresponding specification. The SBTs essentially realizes the separation of NFT holding rights and transfer rights. When the wallet where SBT is located is stolen or unavailable, SBT should be able to be recoverable. 
 
