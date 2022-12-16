@@ -272,9 +272,9 @@ abstract contract ERC721QS is ERC721, IERC721QS {
 
 ## Security Considerations
 
-When an NFT has a `guard`, if the `owner` has `approve` an address, the address still cannot transfer the NFT.
+When an NFT has a `guard`, even if an address is authorized as an operator through `approve` or `setApprovalForAll`, the operator still has no right to transfer the NFT.
 
-For NFT trading platforms (such as OpenSea, LooksRare) that trade through `setApprovalForAll` + holder's signature, when NFT has `guard`, it cannot be traded. It is recommended to prevent such pending orders by checking the interface beforehand.
+For NFT trading platforms that trade through `setApprovalForAll` + holder's signature, when NFT has `guard`, it cannot be traded. It is recommended to prevent such pending orders by checking the interface beforehand.
 
 ## Copyright (copyright)
 
