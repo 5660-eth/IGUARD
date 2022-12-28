@@ -81,6 +81,16 @@ The standard defines a new role `guard` and regulates the permissions of `owner`
 
 `guard`: The `guard` can remove its own `guard` identity or transfer the NFT to a specified address. For example, the `guard` can be set as the cold wallet address of the NFT holder, or an address trusted by the NFT holder. After the `owner` address of the NFT is abnormal, the `guard` can call the contract to transfer the NFT to the specified address.
 
+The `changeGuard(uint256 tokenId, address newGuard)` function MAY be implemented as `public` or `external`.
+
+The `removeGuard(uint256 tokenId)` function MAY be implemented as `public` or `external`.
+
+The `transferAndRemove(address from,address to,uint256 tokenId)` function MAY be implemented as `public` or `external`.
+
+The `guardOf(uint256 tokenId)` function MAY be implemented as `pure` or `view`.
+
+The `UpdateGuardLog` event MUST be emitted when a guard is changed.
+
 The `supportsInterface` method MUST return `true` when called with `0xc0655ef1`.
 
 ## Rationale 
