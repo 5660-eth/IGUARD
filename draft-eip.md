@@ -38,7 +38,7 @@ When a token has no guard, owner, authorised operators and approved address of t
 
 When a token has no guard, `guardOf` MUST return `address(0)`.
   
-When a token has a guard,owner, authorised operators and approved address of the token MUST NOT be able to change guard, and they MUST NOT be able to transfer the token.
+When a token has a guard, owner, authorised operators and approved address of the token MUST NOT be able to change guard, and they MUST NOT be able to transfer the token.
   
 When a token has a guard, `guardOf` MUST return the address of the guard.
   
