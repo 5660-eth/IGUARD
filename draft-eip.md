@@ -46,7 +46,7 @@ When a token has a guard, the guard must be able to remove guard, change guard a
 
 When a token has a guard, if the token burns, the guard MUST be deleted.
 
-When issuing or minting SBTs, in order to facilitate management, the guard MAY be uniformly set to the designated address. 
+When issuing or minting SBTs, the guard MAY be uniformly set to the designated address to facilitate management. 
 
 ### Contract Interface
 
